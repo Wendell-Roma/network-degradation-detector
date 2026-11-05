@@ -3,8 +3,8 @@
 - **Disciplina:** Estrutura de Dados II — Centro Universitário Braz Cubas
 - **Orientadora:** Profa. Dra. Andréa Ono Sakai
 - **Integrantes (Grupo 42):** Wendell Rodrigues Macedo, Vinicius Firmino Souto, Fernando Paiva Coelho, João Gustavo Sanches e Daniel Dias Paranhos
-- **Página Pública do Artigo Técnico (GitHub Pages):** [https://vini-wine-coder.github.io/Projeto-Modelo-Previs-o-Falha-Rede/](https://vini-wine-coder.github.io/Projeto-Modelo-Previs-o-Falha-Rede/)
-- **Repositório Oficial:** [https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede)
+- **Página Pública do Artigo Técnico (GitHub Pages):** [https://vvinedev.github.io/Projeto-Modelo-Previs-o-Falha-Rede/](https://vvinedev.github.io/Projeto-Modelo-Previs-o-Falha-Rede/)
+- **Repositório Oficial:** [https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede)
 
 ---
 

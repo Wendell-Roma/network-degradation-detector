@@ -11,7 +11,7 @@
 - João Gustavo Sanches  
 - Daniel Dias Paranhos  
 **Scrum Master da tarefa:** Wendell Rodrigues Macedo  
-**Repositório GitHub:** [https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede)
+**Repositório GitHub:** [https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede)
 
 > Tarefa 1 coletou. Tarefa 2 fez o baseline e o rótulo. Esta tarefa **não refaz** a ficha nem a tabela de classes.
 >
@@ -256,7 +256,7 @@ Treinamos no mesmo bloco de treino (`treino_periodo_b.csv`, `N = 80.386`) duas v
 
 - [x] Board atualizado
 
-**Link do board / repositório:** [https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede)
+**Link do board / repositório:** [https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede)
 
 | Integrante | O que fiz nesta tarefa | Dificuldades | O que pretendo manter/ajustar |
 |---|---|---|---|

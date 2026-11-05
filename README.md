@@ -9,7 +9,7 @@
 
 ## 🌐 Artigo Técnico Publicado (Página Web)
 
-- **URL pública (GitHub Pages):** [https://vini-wine-coder.github.io/Projeto-Modelo-Previs-o-Falha-Rede/](https://vvinedev.github.io/Projeto-Modelo-Previs-o-Falha-Rede/)
+- **URL pública (GitHub Pages):** [https://vvinedev.github.io/Projeto-Modelo-Previs-o-Falha-Rede/](https://vvinedev.github.io/Projeto-Modelo-Previs-o-Falha-Rede/)
 - **Arquivo principal da página:** [`index.html`](index.html) (estilizado em [`styles/artigo.css`](styles/artigo.css) com diagramas vetoriais autorais em [`images/`](images/))
 - **Quadro de observação de referências (Passo 1 do artigo):** [`metadados/quadro_observacao_artigo.md`](metadados/quadro_observacao_artigo.md)
 
@@ -25,10 +25,11 @@ python3 -m http.server 8000
 
 ## 📊 Resumo Executivo do Experimento Comparativo
 
-Avaliamos **Árvore de Decisão (CART)**, **Random Forest (Bagging)** e **XGBoost (Gradient Boosting)** na detecção multiclasse (`OK`, `RISCO`, `FALHA`) de degradação de rotas de Internet com RTT normalizado por baseline da própria rota (`z_robusto`), utilizando **96.519 janelas reais** da API pública do **RIPE Atlas** (`k-root DNS`, Measurement ID `#10301`) com corte temporal estrito:
+Avaliamos **Árvore de Decisão (CART)**, **Random Forest (Bagging)** e **XGBoost (Gradient Boosting)** na detecção multiclasse (`OK`, `RISCO`, `FALHA`) de degradação de rotas de Internet com RTT normalizado pelo baseline histórico de cada próprio fluxo (`z_robusto`), utilizando **336.326 medições ICMP reais** de 14 dias da API pública do **RIPE Atlas** (*Anchoring Mesh* IPv4), sendo o **Período A** (`06/09/2026` a `13/09/2026`) congelado para cálculo dos baselines (`baseline_por_fluxo.csv`) e o **Período B** (`13/09/2026` a `20/09/2026`, `160.804` medições) dividido com corte temporal estrito:
 
-- **Treino (Período A):** `2026-03-01` a `2026-03-07` (`48.249` janelas)
-- **Teste (Período B):** `2026-03-08` a `2026-03-14` (`48.270` janelas: `28.303 OK`, `189 RISCO`, `19.778 FALHA`)
+- **Treino (50% iniciais do Período B):** `80.386` medições (`47.005 OK`, `252 RISCO`, `33.129 FALHA`)
+- **Validação (20% intermediários do Período B):** `32.148` medições (`18.893 OK`, `131 RISCO`, `13.124 FALHA`)
+- **Teste (30% finais do Período B — aberto uma única vez):** `48.270` medições (`28.303 OK`, `189 RISCO`, `19.778 FALHA`)
 
 | Modelo | Hiperparâmetros Principais | Accuracy | Precision (Macro) | Recall (Macro) | Recall `FALHA` | Recall `RISCO` | F1 (Macro) | Treino (ms) | Inferência / Amostra (µs) |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -53,12 +54,12 @@ Avaliamos **Árvore de Decisão (CART)**, **Random Forest (Bagging)** e **XGBoos
   - `matplotlib==3.9.2`
   - `jupyter==1.1.1`
 
-> **Nota sobre execução determinística:** Os scripts em `src/` foram implementados também com suporte nativo à biblioteca padrão do Python (`csv`, `math`, `random`, `json`) com `SEED = 42`, permitindo reproduzir 100% das métricas, matrizes de confusão e JSONs de saída mesmo em ambientes minimalistas sem dependências externas, além de fornecer o código equivalente em `scikit-learn` e `xgboost` no artigo e nos notebooks.
+> **Nota sobre execução determinística:** Os scripts em `src/` foram implementados também com suporte nativo à biblioteca padrão do Python (`csv`, `math`, `random`, `json`) com `SEED = 42`, permitindo reproduzir 100% das métricas, matrizes de confusão e JSONs de saída mesmo em ambientes minimalistas sem dependências externas, além de fornecer o código equivalente em `scikit-learn` e `xgboost` no artigo, nos notebooks e em `producao/`.
 
 ### 2. Instalação (Opcional, para ambiente virtual completo)
 
 ```bash
-git clone https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede.git
+git clone https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede.git
 cd Projeto-Modelo-Previs-o-Falha-Rede
 python3 -m venv .venv
 source .venv/bin/activate
@@ -67,27 +68,38 @@ pip install -r requirements.txt
 
 ### 3. Onde Estão os Dados
 
-Todos os arquivos de dados processados e auditados já estão versionados no repositório em [`data/processed/`](data/processed/):
+Os metadados, baselines e árvores serializadas estão versionados em [`data/`](data/) e [`metadados/`](metadados/), e os arquivos CSV podem ser gerados ou lidos diretamente em [`data/processed/`](data/processed/):
 
-- [`data/processed/dataset_processado_v0.2.csv`](data/processed/dataset_processado_v0.2.csv) — Dataset consolidado completo (`96.519` janelas de 5 min, 20 probes globais RIPE Atlas).
-- [`data/processed/treino_periodo_a.csv`](data/processed/treino_periodo_a.csv) — Conjunto de Treino (`48.249` janelas, `2026-03-01` a `2026-03-07`).
-- [`data/processed/teste_periodo_b.csv`](data/processed/teste_periodo_b.csv) — Conjunto de Teste temporalmente disjunto (`48.270` janelas, `2026-03-08` a `2026-03-14`).
+- [`data/processed/baseline_por_fluxo.csv`](data/processed/baseline_por_fluxo.csv) — Ficha de baseline histórico do Período A (`mediana`, `MAD`, `IQR`, `jitter_tipico`) para os fluxos monitorados.
+- `data/processed/dataset_rotulado_periodo_b.csv` — Dataset rotulado completo do Período B (`160.804` medições).
+- `data/processed/treino_periodo_b.csv` — Conjunto de Treino (`80.386` medições — 50% iniciais do Período B).
+- `data/processed/validacao_periodo_b.csv` — Conjunto de Validação (`32.148` medições — 20% intermediários do Período B).
+- `data/processed/teste_periodo_b.csv` — Conjunto de Teste temporalmente disjunto (`48.270` medições — 30% finais do Período B).
 - [`metadados/dicionario_dados_v0.4.md`](metadados/dicionario_dados_v0.4.md) — Dicionário de dados completo com unidades, tipos e regras da variável-alvo.
 
-### 4. Comandos para Executar o Pipeline e o Experimento do Artigo
+### 4. Comandos para Executar o Pipeline, o Experimento do Artigo e a Inferência em Produção
 
 ```bash
-# Tarefa 3 — Primeiras árvores de decisão (rasas max_depth=3 e livres)
-python3 src/primeiras_arvores.py
+# Tarefa 1 — Coleta bruta de 14 dias via REST API v2 do RIPE Atlas
+python3 src/coleta_bruta.py
+
+# Tarefa 2 — Cálculo do baseline no Período A, normalização (z_robusto) e rotulagem no Período B
+python3 src/baseline_e_rotulagem.py
+
+# Tarefa 3 — Primeiras árvores de decisão (rasa max_depth=3, livre e contraste)
+python3 src/arvore_inicial.py
 
 # Tarefa 4 — Ajuste da árvore (poda por profundidade, min_samples_leaf e seleção de atributos)
 python3 src/ajuste_arvore.py
 
-# Tarefa 5 — Árvore Final escolhida (7 folhas, regras em português e importância MDI)
+# Tarefa 5 — Árvore Final escolhida (7 folhas, teste único e Protocolo B de fluxos novos)
 python3 src/arvore_final.py
 
 # Artigo Técnico — Experimento comparativo: Árvore de Decisão vs Random Forest vs XGBoost
 python3 src/experimento_artigo.py
+
+# Produção — Carregamento dos modelos (.joblib) e simulação de inferência em tempo real
+python3 producao/inferencia_producao.py
 ```
 
 O script [`src/experimento_artigo.py`](src/experimento_artigo.py) imprime no terminal a tabela comparativa completa, as matrizes de confusão 3×3 e salva todas as métricas auditáveis em [`metadados/resumo_artigo_comparativo.json`](metadados/resumo_artigo_comparativo.json).
@@ -105,29 +117,38 @@ O script [`src/experimento_artigo.py`](src/experimento_artigo.py) imprime no ter
 │   ├── esquema_bagging_vs_boosting.svg                # Esquema conceitual Bagging (Random Forest) vs Boosting (XGBoost)
 │   ├── grafico_metricas_tempos.svg                    # Gráfico comparativo de F1 Macro, Recall RISCO e latência de inferência
 │   └── avatar_*.svg                                   # Avatares vetoriais dos 5 autores
+├── producao/                                          # Pacote de implantação do modelo em produção
+│   ├── artefatos_modelos/                             # Modelos persistidos (.joblib e arvore_final_tarefa5.json)
+│   ├── config/                                        # features.json, baseline_por_fluxo.csv e coleta_config.json
+│   ├── modelos_treinados.py                           # Estimadores compatíveis com scikit-learn (.predict, .predict_proba)
+│   ├── inferencia_producao.py                         # Inferência em produção (autoteste, lote CSV e RIPE Atlas ao vivo)
+│   ├── treinar_e_exportar_sklearn.py                  # Pipeline GridSearchCV + PredefinedSplit + joblib.dump
+│   └── README_PRODUCAO.md                             # Guia de uso do pacote de produção
 ├── src/
-│   ├── preparar_dados.py                              # Tarefa 2: Limpeza, normalização por rota (z_robusto) e split temporal
-│   ├── primeiras_arvores.py                           # Tarefa 3: Árvore rasa vs árvore livre (Gini e Entropia)
+│   ├── coleta_bruta.py                                # Tarefa 1: Coleta bruta de 14 dias via API do RIPE Atlas
+│   ├── baseline_e_rotulagem.py                        # Tarefa 2: Limpeza, normalização por rota (z_robusto) e split temporal
+│   ├── arvore_inicial.py                              # Tarefa 3: Árvore rasa vs árvore livre e árvore de contraste
 │   ├── ajuste_arvore.py                               # Tarefa 4: Varredura de max_depth, min_samples_leaf e subconjuntos de features
-│   ├── arvore_final.py                                # Tarefa 5: Árvore final (7 folhas), regras operacionais e importância MDI
+│   ├── arvore_final.py                                # Tarefa 5: Árvore final (7 folhas), teste único e Protocolo B
 │   └── experimento_artigo.py                          # Artigo: Comparação Árvore de Decisão vs Random Forest vs XGBoost
 ├── notebooks/
-│   ├── 1_Coleta_RIPE_Atlas.ipynb                      # Tarefa 1: Coleta via REST API v2 do RIPE Atlas
-│   ├── 2_Preparacao_e_Auditoria_Dados.ipynb           # Tarefa 2: Preparação e auditoria sem vazamento temporal
-│   ├── 4_Primeiras_Arvores.ipynb                      # Tarefa 3: Experimento das primeiras árvores
+│   ├── 1_Passo_a_Passo_Fluxo.ipynb                    # Descoberta guiada de pares Probe -> Anchor na API RIPE Atlas
+│   ├── 2_Coleta_de_dados.ipynb                        # Tarefa 1: Ingestão via REST API v2 do RIPE Atlas
+│   ├── 3_Baseline_e_Rotulagem.ipynb                   # Tarefa 2: Preparação, baseline por fluxo e rotulagem sem vazamento
+│   ├── 4_Arvore_Inicial.ipynb                         # Tarefa 3: Experimento das primeiras árvores
 │   ├── 5_Ajuste_da_Arvore.ipynb                       # Tarefa 4: Experimento de poda e seleção de atributos
 │   ├── 6_Arvore_Final.ipynb                           # Tarefa 5: Documentação executável da Árvore Final
 │   └── 7_Experimento_Artigo_Arvore_RF_XGBoost.ipynb   # Artigo: Notebook executável comparando os 3 algoritmos
 ├── tarefas/
-│   ├── Tarefa3_Primeiras_Arvores.md                   # Relatório da Tarefa 3
+│   ├── Tarefa1_Coleta_Bruta.md                        # Relatório da Tarefa 1
+│   ├── Tarefa2_Baseline_e_Rotulagem.md                # Relatório da Tarefa 2
+│   ├── Tarefa3_Arvore_Inicial.md                      # Relatório da Tarefa 3
 │   ├── Tarefa4_Ajuste_da_Arvore.md                    # Relatório da Tarefa 4
 │   └── Tarefa5_Arvore_Final.md                        # Relatório da Tarefa 5
 ├── metadados/
-│   ├── dicionario_dados_v0.4.md                       # Dicionário de dados atualizado até a Tarefa 5
+│   ├── dicionario_dados_v0.1.md .. v0.4.md            # Evolução do dicionário de dados (Tarefas 1 a 5)
 │   ├── quadro_observacao_artigo.md                    # Quadro de observação das 2 referências do artigo técnico
-│   ├── resumo_tarefa3.json                            # Métricas da Tarefa 3
-│   ├── resumo_tarefa4.json                            # Métricas da Tarefa 4
-│   ├── resumo_tarefa5.json                            # Métricas da Tarefa 5
+│   ├── resumo_tarefa2.json .. resumo_tarefa5.json     # Métricas auditáveis das Tarefas 2 a 5
 │   └── resumo_artigo_comparativo.json                 # Métricas do comparativo CART vs Random Forest vs XGBoost
 └── requirements.txt                                   # Pacotes e versões de referência
 ```

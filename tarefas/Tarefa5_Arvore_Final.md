@@ -5,7 +5,7 @@
 
 **Equipe:** Grupo 42 — Wendell Rodrigues Macedo, Vinicius Firmino Souto, Fernando Paiva Coelho, João Gustavo Sanches, Daniel Dias Paranhos  
 **Scrum Master da tarefa:** Wendell Rodrigues Macedo  
-**Repositório GitHub:** `https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede`
+**Repositório GitHub:** `https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede`
 
 > A árvore que entra aqui é a da Tarefa 4. O baseline e o rótulo são os da Tarefa 2. O teste, guardado desde a Tarefa 2, é medido **uma vez**.
 >

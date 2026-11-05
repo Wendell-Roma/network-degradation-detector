@@ -12,21 +12,21 @@
 - João Gustavo Sanches  
 - Daniel Dias Paranhos  
 **Scrum Master da tarefa:** Vinicius Firmino Souto  
-**Repositório GitHub:** [https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede)
+**Repositório GitHub:** [https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede)
 
-> Esta tarefa entrega a contextualização do problema e a **ingestão do dado bruto**. Não há classe OK, RISCO ou FALHA. Não há baseline, não há mediana e não há árvore. Quem rotular aqui mistura a coleta com a decisão da Tarefa 2.
+> Esta tarefa entrega o problema e o **dado cru**. Não há classe OK, RISCO ou FALHA. Não há baseline, não há mediana e não há árvore. Quem rotular aqui mistura a coleta com a decisão da Tarefa 2.
 >
-> A coleta foca na diversidade espacial das sondas (probes) mundiais medindo o mesmo destino. RTT alto por distância geográfica **não** é falha. País, IP e nome da sonda **não** serão atributos da futura árvore.
+> A rota entra na coleta só para haver caminhos curtos e longos no mesmo arquivo. RTT alto **não** é falha. País, IP e nome da rota **não** serão coluna da árvore.
 
 ### Contrato desta tarefa
 
 | | Artefato | Quem usa depois |
 |---|---|---|
-| **Entra** | Memorando de decisão de fontes de dados e especificações da disciplina | — |
-| **Sai** | Notebook oficial executado ([`2_Coleta_de_dados.ipynb`](../notebooks/2_Coleta_de_dados.ipynb)) com dados brutos | Tarefa 2 e avaliação docente |
-| **Sai** | Arquivo de metadados da coleta ([`data/raw/ripe_atlas_m1001_20260916T015838Z_metadata.json`](../data/raw/ripe_atlas_m1001_20260916T015838Z_metadata.json)) | Tarefa 2 e repositório Git |
-| **Sai** | Tríade de arquivos brutos preservada no ambiente (`.json`, `.csv`, `_metadata.json`) | Tarefa 2 **é obrigada a usar este bruto** |
-| **Sai** | Este diário de bordo com as contribuições individuais e respostas à correção | Tarefas seguintes |
+| **Entra** | RFC do projeto | — |
+| **Sai** | RFC preenchido pelo grupo (problema, horizonte, custo de errar FALHA, fora de escopo) | Tarefas 2 e 5 |
+| **Sai** | Dicionário v0.1 só com colunas **brutas** da medição | Tarefa 2 |
+| **Sai** | `data/raw/` + `config/` + `requirements.txt` | Tarefa 2 **é obrigada a usar este bruto** |
+| **Sai** | Este diário | Tarefas seguintes |
 
 **Não sai daqui:** baseline, rótulo, `z_robusto`, split, árvore, métrica de modelo.
 
@@ -34,104 +34,142 @@
 
 ## 1. Definição do problema
 
+Responder no diário. A resposta tem de bater com o RFC.
+
 | Pergunta | Resposta do grupo |
 |---|---|
 | Qual evento a árvore vai classificar? | Degradação do fluxo em relação ao **próprio** normal: OK, RISCO ou FALHA. Não é “rota longa” nem “RTT acima de 100 ms”. |
-| O que é um fluxo? | `fluxo_id = probe_id \| dst_addr` (identificador da sonda de origem e endereço do servidor de destino). |
-| O que é cada linha do bruto? | Uma resposta de medição ICMP desse fluxo, com timestamp UTC e granularidade de rajada (`sent`, `rcvd`, `result`). Ainda **sem** classe. |
-| Qual horizonte fica para depois? | Detector: estado da medição atual. Preditor: estado em janelas futuras. A árvore só entra na Tarefa 3. |
-| Quem usa o alerta? | Operadores de enlace/NOC: investigar (FALHA), observar (RISCO) ou não agir (OK). |
-| O que está proibido como definição de falha? | Limiar global fixo de RTT (ex: > 100 ms), país, continente ou IP da rota. |
+| O que é um fluxo? | `fluxo_id = probe_id \| dst_addr` (origem, destino e, se existir, `measurement_id`). |
+| O que é cada linha do bruto? | Uma medição ICMP desse fluxo, com timestamp. Ainda **sem** classe. |
+| Qual horizonte fica para depois? | Detector: estado da medição atual. Preditor: estado 12 minutos à frente. A árvore só entra na Tarefa 3. |
+| Quem usa o alerta? | Quem opera o enlace: investigar (FALHA), observar (RISCO) ou não agir (OK). |
+| O que está proibido como definição de falha? | Limiar global de RTT, país, continente ou nome da rota. |
+
+- [x] RFC do grupo preenchido a partir desta tabela ([RFC_Preditor_Degradacao_Rede.md](../RFC_Preditor_Degradacao_Rede.md))
+- [x] Dicionário v0.1 só com variáveis brutas ([metadados/dicionario_dados_v0.1.md](../metadados/dicionario_dados_v0.1.md))
 
 ---
 
 ## 2. O que coletar (e o que não criar)
 
-Fonte: Medição pública permanente *built-in* **1001** da API RIPE Atlas v2 (ping IPv4 até `k.root-servers.net` / `193.0.14.129`). A coleta foi executada exclusivamente via requisições HTTP `GET`, sem consumo de créditos e sem exposição de chaves privadas.
+Fonte: medições públicas já existentes de ping IPv4 (mesh de Anchors do RIPE Atlas, somente `GET`). Não criar medição própria e não gastar crédito.
 
-### Parâmetros Oficiais da Coleta
-- `MEASUREMENT_ID = 1001` (ping IPv4 contínuo mundial para o K-Root Server)
-- `HORAS_COLETA = 1` (janela móvel representativa de 1 hora)
-- `TIMEOUT_REQUISICAO = 60` segundos
-- `FORMATO_TABELAR = "csv"`
-- **Janela temporal auditada (UTC):** `2026-09-16T00:58:30Z` até `2026-09-16T01:58:30Z`
-- **Timestamp oficial dos arquivos:** `20260916T015838Z`
-
-Cada registro bruto guarda, conforme retornado pela API:
+Cada registro bruto guarda, quando a API trouxer:
 
 | Campo | Unidade | Papel agora |
 |---|---|---|
-| `timestamp` | Unix / UTC | Ordenar temporalmente a série |
-| `prb_id` | inteiro | Identificador único da sonda (origem) |
-| `dst_addr` | IPv4 | Destino da medição (`193.0.14.129`) |
-| `sent`, `rcvd` | contagem | Pacotes transmitidos e recebidos na rajada (típico: 3 pacotes) |
-| `avg`, `min`, `max` | ms | RTT da rajada ICMP. Nulo se não houver resposta. **Nunca gravado como 0** |
-| `result` | lista de objetos | RTT individual de cada pacote respondido |
-| `step` | segundos | Frequência nominal da medição (240 s) |
-| `af` | inteiro | Família de endereços (`4` para IPv4) |
+| `timestamp` | UTC | Ordenar o fluxo |
+| `measurement_id` | — | Identidade da medição |
+| `probe_id` | — | Origem |
+| `dst_addr` | — | Destino |
+| `fluxo_id` | texto estável | `probe_id\|dst_addr` |
+| RTT da rajada (médio; mín/máx se existirem) | ms | Medição. Vazio se não houver resposta. **Nunca 0** |
+| enviados, recebidos | contagem | `sent` e `rcvd` da rajada ICMP |
+| `perda_pct` | % | `(enviados − recebidos) / enviados × 100` |
+| `jitter_ms` | ms | Desvio-padrão dos RTT da rajada **somente** com 2 ou mais respostas. Senão, vazio. **Nunca 0 fingindo estabilidade** |
+| `timeout_atual` | 0 ou 1 | 1 se não há RTT ou perda = 100% |
+| país ou rota | texto | Só auditoria de diversidade. **Fora da futura árvore** |
 
-### Regras de Governança e Decisões Técnicas
-- [x] **Tríade de Salvamento:** Preservação do JSON íntegro original (`ripe_atlas_m1001_20260916T015838Z.json`, ~138,6 MB), da tabela normalizada em CSV (`ripe_atlas_m1001_20260916T015838Z.csv`, ~47,5 MB) e do arquivo de metadados (`ripe_atlas_m1001_20260916T015838Z_metadata.json`, 542 bytes).
-- [x] **Tratamento de Anycast:** O destino `k.root-servers.net` utiliza roteamento anycast (múltiplas instâncias físicas globais anunciam `193.0.14.129`). Portanto, sondas em continentes distintos conectam-se a nós físicos diferentes. A análise é estritamente particionada por `prb_id|dst_addr`, impedindo comparações espúrias de RTT absoluto entre probes diferentes.
-- [x] **Tratamento de Timeouts:** Timeouts e ausências de resposta permanecem com RTT vazio (`null`), sendo estritamente proibido imputar 0 ms para mascarar falhas de comunicação.
-- [x] **Desacoplamento do SIMET:** A base SIMET do memorando da etapa preliminar serviu como estudo comparativo de viabilidade; a fonte oficial, auditável e padronizada para este projeto integrador é a API do RIPE Atlas.
-- [x] **Metadados Versionados:** O arquivo `ripe_atlas_m1001_20260916T015838Z_metadata.json` está integrado ao repositório Git para garantir reprodutibilidade.
+Regras da coleta:
+
+- [x] Vários fluxos, com pelo menos um caminho curto e um caminho longo no mesmo período
+- [x] A diversidade geográfica está documentada e **não** virou classe
+- [x] Dois blocos de tempo contíguos, sem amostra nos dois: Período A (só para o baseline da Tarefa 2) e Período B (medições que serão rotuladas). Referência do projeto: 7 dias + 7 dias a partir de 06/09/2026 04:32 UTC até 20/09/2026 04:32 UTC
+- [x] Timeout permanece no arquivo (`timeout_atual = 1`, RTT vazio, nunca zero)
+- [x] JSON bruto preservado; a tabela tratada não apaga o bruto
+- [x] Parâmetros (período, probes, destinos) em `config/`, não espalhados no código ([config/coleta_config.json](../config/coleta_config.json))
+- [x] HTTP com timeout, releitura em erro transitório e coleta idempotente (rodar de novo não duplica)
+- [x] `requirements.txt` da coleta versionado na raiz do projeto
+
+**Evidências (notebook, commit, trecho do config):**
+- **Arquivo de Configuração Externa:** Parâmetros desacoplados em [`config/coleta_config.json`](../config/coleta_config.json):
+  ```json
+  "janelas_temporais": {
+    "periodo_a_baseline": {
+      "inicio_utc": "2026-09-06T04:32:00Z",
+      "fim_utc": "2026-09-13T04:32:00Z",
+      "duracao_dias": 7,
+      "minimo_amostras_validas_exigido": 1500
+    },
+    "periodo_b_dataset": {
+      "inicio_utc": "2026-09-13T04:32:00Z",
+      "fim_utc": "2026-09-20T04:32:00Z",
+      "duracao_dias": 7
+    }
+  }
+  ```
+- **Código de Ingestão e Idempotência:** Implementado em [`src/coleta_bruta.py`](../src/coleta_bruta.py), garantindo `timeout=120`, tratamento de HTTP 429/5xx com retry exponencial, gravação direta do JSON íntegro e normalização tabular sem substituição de nulos por 0.
 
 ---
 
 ## 3. Relatório de qualidade — ainda sem classe
 
-- [x] Status HTTP 200 verificado e auditado na execução
-- [x] Contagem total de registros confirmada via `len(dados_json)` e `df_raw.shape`
-- [x] Granularidade bruta inspecionada (`prb_id`, `sent`, `rcvd`, `result`)
-- [x] Tipos de dados e valores ausentes verificados via `df_raw.info()`
-- [x] Nenhuma coluna de classe (OK, RISCO, FALHA) atribuída nesta etapa
+- [x] Registros por `fluxo_id` calculados e auditados
+- [x] Início e fim de cada fluxo delimitados estritamente dentro dos 14 dias (sem sobreposição entre A e B)
+- [x] Campos ausentes tratados (RTT vazio é ausência `null`, jamais gravado como zero)
+- [x] Duplicatas verificadas pela tupla `(fluxo_id, timestamp)`
+- [x] Quantidade de timeouts preservada e sinalizada via `timeout_atual = 1`
+- [x] RTT e perda descritos estatisticamente (mínimo, mediana, média, máximo) **sem** atribuir rótulos OK, RISCO ou FALHA
 
 **Métricas Globais da Coleta:**
-- **Nº de registros brutos recebidos:** 203.925 medições ICMP.
-- **Dimensões do DataFrame:** 203.925 linhas × 25 colunas.
-- **Destino monitorado:** `193.0.14.129` (`k.root-servers.net`).
-- **Natureza da amostra:** Prova de conceito espacial de 1 hora com milhares de probes simultâneos distribuídos globalmente.
-- **Cadência observada:** Intervalo nominal `step = 240s` (4 minutos) por sonda.
-- **Integridade de armazenamento:** Integridade validada por testes com `assert` de existência de arquivos e checagem de tamanhos das saídas.
+- **Nº de registros brutos:** 336.326 medições ICMP consolidadas.
+- **Nº de fluxos:** 67 fluxos origem–destino (`probe_id|dst_addr`), cobrindo 22 probes e 21 IPs de destino.
+  - *Fluxos elegíveis para baseline (≥ 1.500 amostras válidas no Período A):* 64 fluxos.
+  - *Fluxos excluídos por insuficiência amostral:* 3 fluxos intra-Brasil para o destino `170.81.100.114` (sem RTT válido no Período A; excluídos rigorosamente sem inventar mediana).
+- **Caminho curto e caminho longo presentes (quais):**
+  - **Caminhos Curtos (Intra-país / Regional Próximo):**
+    - `DE->DE`: mediana ~14 ms (normal baixo europeu).
+    - `AR->AR`: mediana ~10 ms (normal baixo sul-americano).
+    - `BR->BR`: mediana ~50 ms (normal típico continental brasileiro).
+  - **Caminhos Regionais:**
+    - `BR->UY`, `DE->PT`, `ES->PL`, `ZA->KE`, `IN->SG`, `BR->BO`: medianas entre 50 ms e 150 ms.
+  - **Caminhos Longos (Intercontinentais / Transoceânicos Saudáveis):**
+    - `BR->JP`: mediana ~277 ms (saudável, demonstrando que latência estrutural não é defeito).
+    - `BR->IN`: mediana ~339 ms (saudável).
+    - `BR->ZA`: mediana ~344 ms (saudável).
+- **Tratamento de Timeouts e Jitter:**
+  - Registros com perda total (`rcvd == 0`) retêm `latencia_ms = null` e `timeout_atual = 1`.
+  - Jitter médio só calculado com 2 ou mais respostas; rajadas com 1 resposta preservadas com `jitter_ms = null`.
 
 ---
 
 ## 4. Scrum
 
-- [x] **Product Owner:** Profa. Andréa Ono Sakai
-- [x] **Scrum Master da tarefa:** Vinicius Firmino Souto
-- [x] **Equipe de Desenvolvimento:** Wendell Rodrigues Macedo, Fernando Paiva Coelho, João Gustavo Sanches, Daniel Dias Paranhos
-- [x] Board Kanban atualizado com histórias priorizadas e entregues
+- [x] Product Owner = Profa. Andréa Ono Sakai; Scrum Master da tarefa: Vinicius Firmino Souto; Equipe de Desenvolvimento
+- [x] Board com To do / Doing / Done atualizado no repositório GitHub
+- [x] Pelo menos 3 histórias: coletar fluxos diversos; preservar o bruto com timeout; separar Período A e Período B sem rotular
 
 **Histórias de Usuário:**
 
-1. **História 1 — Ingestão Confiável de Dados da Medição Pública 1001:**  
+1. **História 1 — Coleta e Diversidade Topológica de Fluxos:**  
    *Como* desenvolvedor do sistema preditor,  
-   *quero* consumir os resultados públicos da medição 1001 via API REST v2 do RIPE Atlas sem exigência de credenciais privadas ou créditos,  
-   *para que* a equipe disponha de um volume expressivo de medições reais de ping IPv4 em nível mundial.  
+   *quero* consumir medições públicas de ping IPv4 do mesh de Anchors do RIPE Atlas englobando caminhos curtos (ex: `DE->DE`, `BR->BR`) e caminhos longos (ex: `BR->JP`),  
+   *para que* o conjunto de dados contenha a física de diferentes enlaces sem permitir que o algoritmo aprenda distância como defeito.  
    *Critérios de Aceitação:*  
-   - Requisição realizada via HTTP GET com retorno status 200.  
-   - Parâmetros centralizados em bloco de configuração (ID 1001, janela móvel de 1h UTC, timeout 60s).  
-   - Retorno validado contendo 203.925 registros válidos.
+   - Consumo exclusivo via HTTP `GET` sem custos de créditos da API pública.  
+   - Mínimo de 1 caminho curto e 1 caminho longo no mesmo arquivo.  
+   - Registro de metadados das sondas sem transformar dados geográficos em atributos de decisão.
 
-2. **História 2 — Preservação Íntegra do Dado Bruto e Conversão Tabular:**  
+2. **História 2 — Preservação Íntegra do Dado Bruto e Tratamento de Timeout:**  
    *Como* engenheiro de dados,  
-   *quero* salvar o JSON original íntegro e convertê-lo em um DataFrame Pandas estruturado de 25 colunas,  
-   *para que* os atributos brutos de latência e perda sejam preservados sem perda de granularidade e sem imputação artificial de zero para timeouts.  
+   *quero* armazenar as respostas JSON originais e tabelas CSV na pasta `data/raw/` com distinção rigorosa de timeouts e cálculo condicional de jitter,  
+   *para que* falhas de conectividade não sejam mascaradas como 0 ms e o histórico original permaneça auditável para as tarefas seguintes.  
    *Critérios de Aceitação:*  
-   - JSON original armazenado sem truncamento (~138,6 MB).  
-   - DataFrame com 203.925 linhas exibido e inspecionado via `df_raw.info()`.  
-   - Campos de rajada (`sent`, `rcvd`, `result`) mantidos na camada bruta sem agregação prematura.
+   - Armazenamento em `data/raw/` sem sobrescrever arquivos brutos.  
+   - Timeout registrado como `timeout_atual = 1` e `latencia_ms = null` (proibido preencher com 0).  
+   - Jitter preenchido apenas quando `rcvd >= 2`, permanecendo nulo caso contrário.  
+   - Nenhuma coluna de classe (OK/RISCO/FALHA) gerada nesta etapa.
 
-3. **História 3 — Reprodutibilidade, Auditoria e Versionamento de Metadados:**  
-   *Como* analista de qualidade do projeto,  
-   *quero* gerar e versionar no Git o arquivo de metadados da coleta junto com a documentação do repositório,  
-   *para que* qualquer auditor docente possa rastrear a origem, timestamp, parâmetros e integridade da coleta realizada.  
+3. **História 3 — Particionamento Temporal sem Contaminação e Configuração Centralizada:**  
+   *Como* analista do projeto integrador,  
+   *quero* parametrizar a coleta em arquivo `config/coleta_config.json` separando Período A (7 dias de baseline) e Período B (7 dias de medições),  
+   *para que* a Tarefa 2 possa calcular a normalidade de cada fluxo sem sobreposição temporal com os dados que serão classificados.  
    *Critérios de Aceitação:*  
-   - Arquivo `_metadata.json` gerado com timestamp UTC oficial (`20260916T015838Z`) e salvo no Git.  
-   - Notebook `2_Coleta_de_dados.ipynb` documentado com checklist completo e identificação unificada da Equipe 42.  
-   - Contribuições individuais técnicas detalhadas e justificadas para cada membro.
+   - Período A (06/09 a 13/09/2026) e Período B (13/09 a 20/09/2026) rigorosamente contíguos e sem sobreposição.  
+   - Parâmetros de API, rotas e janelas externalizados em `config/`.  
+   - Script de ingestão idempotente que previne duplicação em execuções repetidas.
+
+**Link do board:** [https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede/projects](https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede/projects)
 
 ---
 
@@ -139,21 +177,24 @@ Cada registro bruto guarda, conforme retornado pela API:
 
 | Integrante | O que fiz nesta tarefa | Dificuldades | O que pretendo manter/ajustar |
 |---|---|---|---|
-| **Vinicius Firmino Souto** (Scrum Master) | Coordenação do escopo da equipe, condução das discussões, elaboração da justificativa técnica da escolha do ping IPv4 na medição 1001 em relação ao memorando SIMET e preenchimento do checklist/resumo final. | Alinhar a escolha da fonte de dados mantendo o escopo restrito à ingestão bruta sem rotulagem prematura. | Manter a rotina de reuniões de alinhamento e garantir que os contratos de dados sejam seguidos na Tarefa 2. |
-| **Wendell Rodrigues Macedo** | Configuração dos parâmetros de consulta da API RIPE Atlas (ID 1001, janela móvel de 1h em UTC e timeout de 60s), execução da requisição HTTP com validação do status 200 e versionamento do notebook no repositório GitHub. | Tratar as especificidades de formato temporal em UTC e garantir que a consulta retornasse status HTTP 200 estável. | Manter o controle de versão contínuo e a parametrização explícita para as próximas etapas. |
-| **Fernando Paiva Coelho** | Recepção do payload JSON da API RIPE Atlas, validação estrutural dos dados brutos recebidos e implementação da conversão dos 203.925 registros em DataFrame do Pandas. | Normalizar a estrutura aninhada do JSON original da API sem perda de dimensionalidade de colunas. | Aprimorar as rotinas de tratamento tabular para as tabelas intermediárias da Tarefa 2. |
-| **João Gustavo Sanches** | Inspeção de integridade dos dados brutos no DataFrame, análise dos tipos de colunas, contagem de registros e verificação da granularidade de medição (`prb_id`, `sent`, `rcvd`, `result`). | Evitar que campos nulos de timeout fossem incorretamente imputados como 0 ms durante a análise exploratória. | Automatizar checagens de consistência nos dados brutos antes de iniciar o cálculo do baseline. |
-| **Daniel Dias Paranhos** | Desenvolvimento e execução da rotina de exportação dos arquivos da tríade (JSON original, CSV tabular e metadados da coleta) e implementação dos testes de validação com `assert` de existência e tamanho. | Assegurar que os arquivos gerados no Drive/ambiente contivessem nomenclatura rastreável e compatível entre si. | Padronizar as rotinas de exportação para que as tarefas seguintes gerem saídas auditáveis. |
+| **Vinicius Firmino Souto** (Scrum Master) | Condução das cerimônias Scrum, definição e priorização das 3 histórias no quadro Kanban, estruturação do diário da Tarefa 1 e curadoria dos pares de fluxos curtos (`BR->BR`, `DE->DE`) e longos (`BR->JP`, `BR->ZA`) no RFC. | Conciliar a visão de redes com o contrato de dados estático exigido para o aprendizado de máquina. | Manter a rotina de reuniões assíncronas e assegurar que a Tarefa 2 utilize estritamente o `data/raw/` gerado. |
+| **Wendell Rodrigues Macedo** | Desenvolvimento do módulo de ingestão [`src/coleta_bruta.py`](../src/coleta_bruta.py), externalização dos parâmetros em [`config/coleta_config.json`](../config/coleta_config.json) e implementação de lógica de retries (HTTP 429/5xx) e timeout HTTP. | Tratar as variações de payload retornado pelo RIPE Atlas e garantir idempotência sem sobrescrita destrutiva. | Manter o desacoplamento de parâmetros em arquivos JSON/YAML e refinar o tratamento de exceções de rede. |
+| **Fernando Paiva Coelho** | Criação do Dicionário de Dados v0.1 ([`metadados/dicionario_dados_v0.1.md`](../metadados/dicionario_dados_v0.1.md)) e do arquivo formal de metadados ([`metadados/ripe_atlas_metadata.json`](../metadados/ripe_atlas_metadata.json)), documentando cada tipo e regra de nulidade. | Mapear claramente por que colunas geográficas (`dst_addr`, `probe_id`) devem ser excluídas da árvore na modelagem. | Expandir o dicionário para a versão v0.2 na Tarefa 2, documentando as fórmulas do baseline e as features relativas. |
+| **João Gustavo Sanches** | Implementação dos filtros de tratamento bruto no extrator de dados: preservação da flag `timeout_atual`, garantia de RTT vazio (sem 0) e cálculo condicional do jitter amostral apenas com `rcvd >= 2`. | Evitar a armadilha comum de preencher nulos com zero durante a normalização inicial com Pandas. | Automatizar testes unitários de integridade para validar que nenhum valor zerado espúrio entre no dataset. |
+| **Daniel Dias Paranhos** | Elaboração do Relatório de Qualidade dos dados brutos: verificação de integridade temporal entre Período A e B, conferência de duplicatas `(fluxo_id, timestamp)` e auditoria dos 3 fluxos insuficientes. | Isolar estatísticas descritivas (mínimo, média, mediana) sem emitir qualquer juízo ou rótulo de classe (OK/RISCO/FALHA). | Desenvolver scripts de inspeção prévia para alimentar a seção de análise exploratória da Tarefa 2. |
 
 ---
 
 ## 6. Evidências gerais
 
-- **Notebook Oficial da Coleta:** [`2_Coleta_de_dados.ipynb`](../notebooks/2_Coleta_de_dados.ipynb)
-- **Metadados Versionados da Ingestão:** [`data/raw/ripe_atlas_m1001_20260916T015838Z_metadata.json`](../data/raw/ripe_atlas_m1001_20260916T015838Z_metadata.json)
-- **Memorando Prévio de Decisão:** [`README.md`](../README.md)
-- **Parecer e Correção Docente Atendida:** [`Correcao_Grupo42.md`](../../Correcao_Grupo42.md)
-- **Repositório GitHub Oficial:** [https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede)
+- **RFC do Projeto:** [`RFC_Preditor_Degradacao_Rede.md`](../RFC_Preditor_Degradacao_Rede.md)
+- **Dicionário de Dados v0.1:** [`metadados/dicionario_dados_v0.1.md`](../metadados/dicionario_dados_v0.1.md)
+- **Metadados da Ingestão:** [`metadados/ripe_atlas_metadata.json`](../metadados/ripe_atlas_metadata.json)
+- **Configuração da Coleta:** [`config/coleta_config.json`](../config/coleta_config.json)
+- **Script de Coleta e Auditoria:** [`src/coleta_bruta.py`](../src/coleta_bruta.py)
+- **Camada de Dados Brutos:** [`data/raw/`](../data/raw/) (com [`data/raw/README.md`](../data/raw/README.md))
+- **Dependências de Ambiente:** [`requirements.txt`](../requirements.txt)
+- **Repositório GitHub e Commits:** [https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede)
 
 ---
 
@@ -161,8 +202,8 @@ Cada registro bruto guarda, conforme retornado pela API:
 
 | Critério | Peso | Nota máxima | Autoavaliação / Justificativa |
 |---|---|---|---|
-| **Problema e Escopo** | 0,5 | 0,50 | Unidade de observação (`prb_id\|dst_addr`), granularidade de medição e proibição formal de RTT absoluto como falha estão explicitados no diário e no notebook. |
-| **Coleta Bruta e Integridade** | 1,5 | 1,50 | Medição 1001 executada com HTTP 200 e 203.925 registros; tríade JSON/CSV/metadados íntegra; timeouts preservados sem imputação de 0 ms; anycast explicitado. |
-| **Documentação e Decisões** | 1,0 | 1,00 | Janela temporal auditada (00:58 a 01:58 UTC de 16/09/2026), timestamp oficial unificado, papel do SIMET esclarecido e metadados anexados ao repositório. |
-| **Scrum e Contribuições Individuais** | 1,0 | 1,00 | Papéis definidos (PO, SM, Devs), 3 histórias de usuário com critérios de aceitação e diário de bordo com contribuições técnicas individualizadas e verificáveis para os 5 integrantes. |
-| **Total** | **4,0** | **4,00 / 4,00** | Entrega totalmente alinhada ao notebook executado e às orientações formativas da correção. |
+| Problema | 0,5 | 0,50 | Fluxo (`probe_id\|dst_addr`), unidade de análise e proibição formal de RTT absoluto como falha estão explicitados no diário e no RFC. |
+| Coleta bruta | 1,5 | 1,50 | Diversidade contemplada com caminhos curtos e longos, timeout preservado (`timeout_atual = 1`), RTT nulo ≠ 0, jitter sem falso 0, parâmetros em `config/` e camada `data/raw/` intocável. |
+| Período A e Período B sem rótulo | 1,0 | 1,00 | Blocos de 7 dias contíguos e não sobrepostos (06/09 a 13/09 e 13/09 a 20/09); relatório de qualidade descritivo estritamente **sem** classes. |
+| Scrum + diário | 1,0 | 1,00 | Papéis definidos (PO, SM, Devs), 3 histórias de usuário com critérios de aceitação, link do repositório/board e diário de bordo com contribuições técnicas individualizadas para os 5 alunos. |
+| **Total** | **4,0** | **4,00 / 4,00** | Entrega robusta, rastreável e aderente às diretrizes docentes. |

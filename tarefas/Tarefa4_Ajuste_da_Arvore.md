@@ -5,7 +5,7 @@
 
 **Equipe:** Grupo 42 — Wendell Rodrigues Macedo, Vinicius Firmino Souto, Fernando Paiva Coelho, João Gustavo Sanches, Daniel Dias Paranhos  
 **Scrum Master da tarefa:** Wendell Rodrigues Macedo  
-**Repositório GitHub:** `https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede`
+**Repositório GitHub:** `https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede`
 
 > O rótulo e o baseline da Tarefa 2 continuam. O corte temporal continua. Esta tarefa **não troca o algoritmo**: ajusta a mesma árvore de decisão com o que a Tarefa 3 errou.
 >

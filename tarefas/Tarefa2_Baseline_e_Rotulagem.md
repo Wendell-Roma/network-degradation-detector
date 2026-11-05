@@ -11,7 +11,7 @@
 - João Gustavo Sanches  
 - Daniel Dias Paranhos  
 **Scrum Master da tarefa:** Wendell Rodrigues Macedo  
-**Repositório GitHub:** [https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede)
+**Repositório GitHub:** [https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede)
 
 > Esta tarefa lê o `data/raw/` da Tarefa 1. Não troca a coleta sem versionar.
 >
@@ -195,7 +195,7 @@ O particionamento foi executado de forma estritamente cronológica dentro de cad
 
 - [x] Board atualizado
 
-**Link do board:** [https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vini-wine-coder/Projeto-Modelo-Previs-o-Falha-Rede)
+**Link do board:** [https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede](https://github.com/vvinedev/Projeto-Modelo-Previs-o-Falha-Rede)
 
 | Integrante | O que fiz nesta tarefa | Dificuldades | O que pretendo manter/ajustar |
 |---|---|---|---|
