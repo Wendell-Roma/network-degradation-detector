@@ -1,0 +1,378 @@
+{
+  "tarefa": "Tarefa 5 — Árvore Final e Abertura Única do Teste",
+  "origem_arvore": "Idêntica à Árvore Ajustada da Tarefa 4 (congelada antes de abrir o teste)",
+  "parametros": {
+    "algoritmo": "DecisionTreeClassifier (CART)",
+    "criterion": "entropy",
+    "max_depth": 6,
+    "min_samples_leaf": 20,
+    "random_state": 42
+  },
+  "colunas_modelo": [
+    "z_robusto",
+    "aumento_pct",
+    "jitter_relativo",
+    "perda_pct",
+    "timeout_atual",
+    "n5_timeout",
+    "n5_aumento80",
+    "n5_risco"
+  ],
+  "medianas_imputacao_treino": {
+    "z_robusto": 0.4634,
+    "aumento_pct": 1.2828,
+    "jitter_relativo": 1.3039,
+    "perda_pct": 0.0,
+    "timeout_atual": 0.0,
+    "n5_timeout": 0.0,
+    "n5_aumento80": 0.0,
+    "n5_risco": 0.0
+  },
+  "profundidade_obtida": 6,
+  "n_folhas": 7,
+  "n_nos": 13,
+  "regras_portugues": [
+    {
+      "regra_pt": "Se z_robusto <= 3.5010 e perda_pct <= 16.6650 e n5_aumento80 <= 1.5000 e n5_timeout <= 2.5000 e z_robusto <= 2.0003, então classe = OK",
+      "classe_folha": "OK",
+      "profundidade_folha": 5,
+      "n_treino": 46212,
+      "contagem_treino": {
+        "OK": 46212,
+        "RISCO": 0,
+        "FALHA": 0
+      },
+      "impureza": -0.0
+    },
+    {
+      "regra_pt": "Se z_robusto <= 3.5010 e perda_pct <= 16.6650 e n5_aumento80 <= 1.5000 e n5_timeout <= 2.5000 e z_robusto > 2.0003 e n5_risco <= 1.5000, então classe = OK",
+      "classe_folha": "OK",
+      "profundidade_folha": 6,
+      "n_treino": 793,
+      "contagem_treino": {
+        "OK": 793,
+        "RISCO": 0,
+        "FALHA": 0
+      },
+      "impureza": -0.0
+    },
+    {
+      "regra_pt": "Se z_robusto <= 3.5010 e perda_pct <= 16.6650 e n5_aumento80 <= 1.5000 e n5_timeout <= 2.5000 e z_robusto > 2.0003 e n5_risco > 1.5000, então classe = RISCO",
+      "classe_folha": "RISCO",
+      "profundidade_folha": 6,
+      "n_treino": 252,
+      "contagem_treino": {
+        "OK": 0,
+        "RISCO": 252,
+        "FALHA": 0
+      },
+      "impureza": -0.0
+    },
+    {
+      "regra_pt": "Se z_robusto <= 3.5010 e perda_pct <= 16.6650 e n5_aumento80 <= 1.5000 e n5_timeout > 2.5000, então classe = FALHA",
+      "classe_folha": "FALHA",
+      "profundidade_folha": 4,
+      "n_treino": 1372,
+      "contagem_treino": {
+        "OK": 0,
+        "RISCO": 0,
+        "FALHA": 1372
+      },
+      "impureza": -0.0
+    },
+    {
+      "regra_pt": "Se z_robusto <= 3.5010 e perda_pct <= 16.6650 e n5_aumento80 > 1.5000, então classe = FALHA",
+      "classe_folha": "FALHA",
+      "profundidade_folha": 3,
+      "n_treino": 1891,
+      "contagem_treino": {
+        "OK": 0,
+        "RISCO": 0,
+        "FALHA": 1891
+      },
+      "impureza": -0.0
+    },
+    {
+      "regra_pt": "Se z_robusto <= 3.5010 e perda_pct > 16.6650, então classe = FALHA",
+      "classe_folha": "FALHA",
+      "profundidade_folha": 2,
+      "n_treino": 10297,
+      "contagem_treino": {
+        "OK": 0,
+        "RISCO": 0,
+        "FALHA": 10297
+      },
+      "impureza": -0.0
+    },
+    {
+      "regra_pt": "Se z_robusto > 3.5010, então classe = FALHA",
+      "classe_folha": "FALHA",
+      "profundidade_folha": 1,
+      "n_treino": 19569,
+      "contagem_treino": {
+        "OK": 0,
+        "RISCO": 0,
+        "FALHA": 19569
+      },
+      "impureza": -0.0
+    }
+  ],
+  "arvore": {
+    "depth": 0,
+    "n_samples": 80386,
+    "counts": [
+      47005,
+      252,
+      33129
+    ],
+    "counts_dict": {
+      "OK": 47005,
+      "RISCO": 252,
+      "FALHA": 33129
+    },
+    "impurity": 1.005784,
+    "criterion": "entropy",
+    "pred_class": "OK",
+    "is_leaf": false,
+    "feature_idx": 0,
+    "feature": "z_robusto",
+    "threshold": 3.501,
+    "impurity_gain": 0.398422,
+    "left": {
+      "depth": 1,
+      "n_samples": 60817,
+      "counts": [
+        47005,
+        252,
+        13560
+      ],
+      "counts_dict": {
+        "OK": 47005,
+        "RISCO": 252,
+        "FALHA": 13560
+      },
+      "impurity": 0.802793,
+      "criterion": "entropy",
+      "pred_class": "OK",
+      "is_leaf": false,
+      "feature_idx": 3,
+      "feature": "perda_pct",
+      "threshold": 16.665,
+      "impurity_gain": 0.478627,
+      "left": {
+        "depth": 2,
+        "n_samples": 50520,
+        "counts": [
+          47005,
+          252,
+          3263
+        ],
+        "counts_dict": {
+          "OK": 47005,
+          "RISCO": 252,
+          "FALHA": 3263
+        },
+        "impurity": 0.390238,
+        "criterion": "entropy",
+        "pred_class": "OK",
+        "is_leaf": false,
+        "feature_idx": 6,
+        "feature": "n5_aumento80",
+        "threshold": 1.5,
+        "impurity_gain": 0.166981,
+        "left": {
+          "depth": 3,
+          "n_samples": 48629,
+          "counts": [
+            47005,
+            252,
+            1372
+          ],
+          "counts_dict": {
+            "OK": 47005,
+            "RISCO": 252,
+            "FALHA": 1372
+          },
+          "impurity": 0.231939,
+          "criterion": "entropy",
+          "pred_class": "OK",
+          "is_leaf": false,
+          "feature_idx": 5,
+          "feature": "n5_timeout",
+          "threshold": 2.5,
+          "impurity_gain": 0.185353,
+          "left": {
+            "depth": 4,
+            "n_samples": 47257,
+            "counts": [
+              47005,
+              252,
+              0
+            ],
+            "counts_dict": {
+              "OK": 47005,
+              "RISCO": 252,
+              "FALHA": 0
+            },
+            "impurity": 0.047939,
+            "criterion": "entropy",
+            "pred_class": "OK",
+            "is_leaf": false,
+            "feature_idx": 0,
+            "feature": "z_robusto",
+            "threshold": 2.0003,
+            "impurity_gain": 0.030316,
+            "left": {
+              "depth": 5,
+              "n_samples": 46212,
+              "counts": [
+                46212,
+                0,
+                0
+              ],
+              "counts_dict": {
+                "OK": 46212,
+                "RISCO": 0,
+                "FALHA": 0
+              },
+              "impurity": -0.0,
+              "criterion": "entropy",
+              "pred_class": "OK",
+              "is_leaf": true
+            },
+            "right": {
+              "depth": 5,
+              "n_samples": 1045,
+              "counts": [
+                793,
+                252,
+                0
+              ],
+              "counts_dict": {
+                "OK": 793,
+                "RISCO": 252,
+                "FALHA": 0
+              },
+              "impurity": 0.796945,
+              "criterion": "entropy",
+              "pred_class": "OK",
+              "is_leaf": false,
+              "feature_idx": 7,
+              "feature": "n5_risco",
+              "threshold": 1.5,
+              "impurity_gain": 0.796945,
+              "left": {
+                "depth": 6,
+                "n_samples": 793,
+                "counts": [
+                  793,
+                  0,
+                  0
+                ],
+                "counts_dict": {
+                  "OK": 793,
+                  "RISCO": 0,
+                  "FALHA": 0
+                },
+                "impurity": -0.0,
+                "criterion": "entropy",
+                "pred_class": "OK",
+                "is_leaf": true
+              },
+              "right": {
+                "depth": 6,
+                "n_samples": 252,
+                "counts": [
+                  0,
+                  252,
+                  0
+                ],
+                "counts_dict": {
+                  "OK": 0,
+                  "RISCO": 252,
+                  "FALHA": 0
+                },
+                "impurity": -0.0,
+                "criterion": "entropy",
+                "pred_class": "RISCO",
+                "is_leaf": true
+              }
+            }
+          },
+          "right": {
+            "depth": 4,
+            "n_samples": 1372,
+            "counts": [
+              0,
+              0,
+              1372
+            ],
+            "counts_dict": {
+              "OK": 0,
+              "RISCO": 0,
+              "FALHA": 1372
+            },
+            "impurity": -0.0,
+            "criterion": "entropy",
+            "pred_class": "FALHA",
+            "is_leaf": true
+          }
+        },
+        "right": {
+          "depth": 3,
+          "n_samples": 1891,
+          "counts": [
+            0,
+            0,
+            1891
+          ],
+          "counts_dict": {
+            "OK": 0,
+            "RISCO": 0,
+            "FALHA": 1891
+          },
+          "impurity": -0.0,
+          "criterion": "entropy",
+          "pred_class": "FALHA",
+          "is_leaf": true
+        }
+      },
+      "right": {
+        "depth": 2,
+        "n_samples": 10297,
+        "counts": [
+          0,
+          0,
+          10297
+        ],
+        "counts_dict": {
+          "OK": 0,
+          "RISCO": 0,
+          "FALHA": 10297
+        },
+        "impurity": -0.0,
+        "criterion": "entropy",
+        "pred_class": "FALHA",
+        "is_leaf": true
+      }
+    },
+    "right": {
+      "depth": 1,
+      "n_samples": 19569,
+      "counts": [
+        0,
+        0,
+        19569
+      ],
+      "counts_dict": {
+        "OK": 0,
+        "RISCO": 0,
+        "FALHA": 19569
+      },
+      "impurity": -0.0,
+      "criterion": "entropy",
+      "pred_class": "FALHA",
+      "is_leaf": true
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "projeto": "Preditor de degradação de rede com RTT normalizado (independente da rota)",
+  "versao_coleta": "v1.0",
+  "janelas_temporais": {
+    "periodo_a_baseline": {
+      "inicio_utc": "2026-09-06T04:32:00Z",
+      "fim_utc": "2026-09-13T04:32:00Z",
+      "duracao_dias": 7,
+      "minimo_amostras_validas_exigido": 1500
+    },
+    "periodo_b_dataset": {
+      "inicio_utc": "2026-09-13T04:32:00Z",
+      "fim_utc": "2026-09-20T04:32:00Z",
+      "duracao_dias": 7
+    }
+  },
+  "parametros_mesh": {
+    "step_segundos": 240,
+    "af": 4,
+    "tipo": "ping",
+    "pacotes_rajada": 3
+  },
+  "rotas_geograficas": [
+    {"origem": "BR", "destino": "BR", "escopo": "curto", "mediana_referencia_ms": 50},
+    {"origem": "DE", "destino": "DE", "escopo": "curto", "mediana_referencia_ms": 14},
+    {"origem": "AR", "destino": "AR", "escopo": "curto", "mediana_referencia_ms": 10},
+    {"origem": "BR", "destino": "UY", "escopo": "regional", "mediana_referencia_ms": 65},
+    {"origem": "DE", "destino": "PT", "escopo": "regional", "mediana_referencia_ms": 48},
+    {"origem": "ES", "destino": "PL", "escopo": "regional", "mediana_referencia_ms": 55},
+    {"origem": "ZA", "destino": "KE", "escopo": "regional", "mediana_referencia_ms": 90},
+    {"origem": "IN", "destino": "SG", "escopo": "regional", "mediana_referencia_ms": 75},
+    {"origem": "BR", "destino": "BO", "escopo": "regional", "mediana_referencia_ms": 85},
+    {"origem": "BR", "destino": "JP", "escopo": "longo", "mediana_referencia_ms": 277},
+    {"origem": "BR", "destino": "IN", "escopo": "longo", "mediana_referencia_ms": 339},
+    {"origem": "BR", "destino": "ZA", "escopo": "longo", "mediana_referencia_ms": 344}
+  ]
+}

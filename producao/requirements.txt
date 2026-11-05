@@ -1,0 +1,7 @@
+# Dependências para reprodução dos experimentos e notebooks (Python >= 3.10)
+scikit-learn==1.5.2
+xgboost==2.1.2
+pandas==2.2.3
+numpy==2.1.2
+matplotlib==3.9.2
+jupyter==1.1.1

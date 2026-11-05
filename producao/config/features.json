@@ -1,0 +1,58 @@
+{
+  "projeto": "Preditor de Degradação de Rede com RTT Normalizado (Independente da Rota)",
+  "grupo": "Grupo 42 — Estrutura de Dados II",
+  "modelo_recomendado_producao": "arvore_decisao (CART, 7 folhas, criterion='entropy', max_depth=6, min_samples_leaf=20)",
+  "classes": [
+    "OK",
+    "RISCO",
+    "FALHA"
+  ],
+  "alvo": "status_atual",
+  "colunas_excluidas_do_treino": [
+    "fluxo_id",
+    "prb_id",
+    "dst_addr",
+    "msm_id",
+    "timestamp",
+    "split",
+    "rtt_mediano_ms",
+    "rtt_min_ms",
+    "rtt_max_ms",
+    "mediana_rtt_a",
+    "iqr_rtt_a",
+    "p95_rtt_a",
+    "p99_rtt_a",
+    "status_atual",
+    "alvo_t_mais_3"
+  ],
+  "features": [
+    "z_robusto",
+    "aumento_pct",
+    "jitter_relativo",
+    "perda_pct",
+    "timeout_atual",
+    "n5_timeout",
+    "n5_aumento80",
+    "n5_risco"
+  ],
+  "descricao_features": {
+    "z_robusto": "(rtt_mediano_ms - mediana_rtt_a) / iqr_rtt_a — desvio normalizado pelo baseline do próprio fluxo",
+    "aumento_pct": "((rtt_mediano_ms - mediana_rtt_a) / mediana_rtt_a) * 100 — aumento percentual sobre a mediana histórica",
+    "jitter_relativo": "((rtt_max_ms - rtt_min_ms) / mediana_rtt_a) * 100 — oscilação intrajanela relativa",
+    "perda_pct": "((sent - rcvd) / sent) * 100 — taxa de perda de pacotes ICMP na medição atual",
+    "timeout_atual": "1 se rcvd == 0 ou RTT ausente, 0 caso contrário",
+    "n5_timeout": "Contagem de timeouts nas últimas 5 medições do fluxo",
+    "n5_aumento80": "Contagem de medições com aumento_pct > 80% nas últimas 5 medições do fluxo",
+    "n5_risco": "Contagem de medições em condição de atenção nas últimas 5 medições do fluxo"
+  },
+  "medianas_imputacao_treino": {
+    "z_robusto": 0.4634,
+    "aumento_pct": 1.2828,
+    "jitter_relativo": 1.3039,
+    "perda_pct": 0.0,
+    "timeout_atual": 0.0,
+    "n5_timeout": 0.0,
+    "n5_aumento80": 0.0,
+    "n5_risco": 0.0
+  }
+}

@@ -1,5 +1,6 @@
 *.csv
 !data/processed/baseline_por_fluxo.csv
+!producao/config/baseline_por_fluxo.csv
 *.parquet
 *.zip
 data/raw/*.json
