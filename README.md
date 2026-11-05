@@ -9,7 +9,7 @@
 
 ## 🌐 Artigo Técnico Publicado (Página Web)
 
-- **URL pública (GitHub Pages):** [https://vini-wine-coder.github.io/Projeto-Modelo-Previs-o-Falha-Rede/](https://vini-wine-coder.github.io/Projeto-Modelo-Previs-o-Falha-Rede/)
+- **URL pública (GitHub Pages):** [https://vini-wine-coder.github.io/Projeto-Modelo-Previs-o-Falha-Rede/](https://vvinedev.github.io/Projeto-Modelo-Previs-o-Falha-Rede/)
 - **Arquivo principal da página:** [`index.html`](index.html) (estilizado em [`styles/artigo.css`](styles/artigo.css) com diagramas vetoriais autorais em [`images/`](images/))
 - **Quadro de observação de referências (Passo 1 do artigo):** [`metadados/quadro_observacao_artigo.md`](metadados/quadro_observacao_artigo.md)
 
